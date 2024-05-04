@@ -9,7 +9,7 @@ readr::read_csv("raw_data/raw_data.csv")
 
 # Clean data
 activities_cleaned <- activities_raw |> 
-  as_tibble() |> # Create a tibble for readability
+  tibble::as_tibble() |> # Create a tibble for readability
   dplyr::select(
     name:sport_type, 
     average_speed:kilojoules, 
