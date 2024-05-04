@@ -1,30 +1,36 @@
+library(dplyr)
+library(tibble)
+library(forcats)
+library(lubridate)
+library(tidyr)
+
 # Load the raw data
 readr::read_csv("raw_data/raw_data.csv")
 
 # Clean data
 activities_cleaned <- activities_raw |> 
   as_tibble() |> # Create a tibble for readability
-  select(
+  dplyr::select(
     name:sport_type, 
     average_speed:kilojoules, 
     has_heartrate, 
     average_heartrate, 
     max_heartrate, 
     start_date_local) |> 
-  mutate(
-    across(
+  dplyr::mutate(
+    dplyr::across(
       c(
         "distance", "moving_time", "elapsed_time", "total_elevation_gain",
         "average_speed", "max_speed", "kilojoules", "average_heartrate"
       ),
       ~ as.double(.x)
     ),
-    has_heartrate = as_factor(has_heartrate),
-    sport_type = as_factor(case_when(
+    has_heartrate = forcats::as_factor(has_heartrate),
+    sport_type = forcats::as_factor(case_when(
       sport_type == "VirtualRide" ~ "Virtual Ride")
     )
   ) |>
-  rename(
+  dplyr::rename(
     session = name,
     avg_hr_bpm = average_heartrate,
     max_hr_bpm = max_heartrate,
@@ -32,7 +38,7 @@ activities_cleaned <- activities_raw |>
     kcal_exp = kilojoules,
     elev_gain_m = total_elevation_gain,
   ) |> 
-  mutate(
+  dplyr::mutate(
     distance_km = round(distance / 1000, 2),
     moving_time_min = round(moving_time / 60, 2),
     elapsed_time_min = round(elapsed_time / 60, 2),
@@ -41,12 +47,13 @@ activities_cleaned <- activities_raw |>
     elev_gain_m_per_min = round(elev_gain_m / moving_time_min, 2),
     start_date_local = gsub("Z$", "", start_date_local)
   ) |>
-  separate(start_date_local, into = c("date", "time"), sep = "T") |> 
+  tidyr::separate(start_date_local, into = c("date", "time"), sep = "T") |> 
   mutate(
     date = as.Date(date),
     time = hms(time),
     weekday = wday(date, label = TRUE),
     month = month(date, label = TRUE),
+    month_number = month(date, label = FALSE),
     year = year(date)
   ) |> 
   select(
@@ -59,7 +66,7 @@ readr::write_csv(
   "data/cleaned_data.csv"
 )
 
-# Remove
+# Remove objects
 remove(activities_cleaned)
 remove(activities_raw)
 remove(convert_list_to_tbl)

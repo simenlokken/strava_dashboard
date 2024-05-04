@@ -1,5 +1,4 @@
 library(purrr)
-source("code/functions/convert_list_to_tbl.R")
 source("code/functions/fetch_strava_token.R")
 
 # Save Strava token as an object
