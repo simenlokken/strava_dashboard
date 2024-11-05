@@ -1,4 +1,4 @@
-// Load libraries
+// Load namespaces
 
 using System;
 using System.Collections.Generic;
@@ -8,12 +8,8 @@ using System.Text.Json;
 using System.Threading.Tasks;
 using System.Linq;
 
-// Actual program
-
-// Create a class called StravaFetcher which encapsulates the methods related to fetching data and saving it to a .csv file
-public class StravaFetcher
+public class FetchStravaData // Define FetchStravaData class
 {
-    // Method, receives access token from Strava API
     public static async Task<string> FetchAccessToken()
     {
         // URL endpoint
@@ -23,10 +19,8 @@ public class StravaFetcher
         string clientSecret = Environment.GetEnvironmentVariable("STRAVA_CLIENT_SECRET") ?? "";
         string refreshToken = Environment.GetEnvironmentVariable("STRAVA_REFRESH_TOKEN") ?? "";
 
-        // HttpClient is a class for sending HTTP requests
         using HttpClient client = new HttpClient();
 
-        // Set a payload variable containing key-value pairs
         var payload = new FormUrlEncodedContent(new[]
         {
             new KeyValuePair<string, string>("client_id", clientId),
@@ -35,16 +29,13 @@ public class StravaFetcher
             new KeyValuePair<string, string>("grant_type", "refresh_token"),
         });
 
-        // Sends the request to the API with URL and payload, stored in variable called response
         HttpResponseMessage response = await client.PostAsync(authUrl, payload);
 
-        // Error handling
         if (!response.IsSuccessStatusCode)
         {
-            throw new Exception($"Failed to fetch access token. Status Code: {response.StatusCode}");
+            throw new Exception($"Failed to fetch access token. Status code: {response.StatusCode}");
         }
 
-        // Fetches the content in the API response as a string called results
         string result = await response.Content.ReadAsStringAsync();
         JsonDocument json = JsonDocument.Parse(result);
         string accessToken = json.RootElement.GetProperty("access_token").GetString() ?? "";
@@ -94,8 +85,7 @@ public class StravaFetcher
         return activities;
     }
 
-    // New method to save activities to a CSV file
-    public static void SaveActivitiesToCsv(List<Dictionary<string, object>> activities, string filePath)
+    public static void SaveActivitiesAsCSV(List<Dictionary<string, object>> activities, string filePath)
     {
         if (activities.Count == 0)
         {
@@ -103,15 +93,19 @@ public class StravaFetcher
             return;
         }
 
-        // Get headers from the first activity
+        // Ensure directory exists
+        string directoryPath = Path.GetDirectoryName(filePath);
+        if (!Directory.Exists(directoryPath))
+        {
+            Directory.CreateDirectory(directoryPath);
+        }
+
         var headers = activities[0].Keys;
 
         using (var writer = new StreamWriter(filePath))
         {
-            // Write headers
             writer.WriteLine(string.Join(",", headers));
 
-            // Write each activity
             foreach (var activity in activities)
             {
                 var row = headers.Select(header => activity.ContainsKey(header) ? activity[header].ToString() : "");
@@ -129,15 +123,12 @@ public class Program
     {
         try
         {
-            // Fetch access token
-            string accessToken = await StravaFetcher.FetchAccessToken();
+            string accessToken = await FetchStravaData.FetchAccessToken();
+            var activities = await FetchStravaData.GetStravaActivities(accessToken);
 
-            // Fetch activities using access token
-            var activities = await StravaFetcher.GetStravaActivities(accessToken);
-
-            // Save activities to a CSV file
-            string filePath = "strava_activities.csv";
-            StravaFetcher.SaveActivitiesToCsv(activities, filePath);
+            // Specify the directory and file path
+            string filePath = Path.Combine("data", "raw_data", "activities.csv");
+            FetchStravaData.SaveActivitiesAsCSV(activities, filePath);
         }
         catch (Exception ex)
         {

@@ -25,4 +25,4 @@ Currently complete, but lacks better error handling in some scripts and a main.p
 
 ### Csharp
 
-Currently complete, but data is not stored in dedicated folder.
+Currently complete (I guess).
