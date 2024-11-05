@@ -21,4 +21,8 @@ Both the Python and C# code perform the exact same operation, just in two differ
 
 ### Python
 
+Currently complete, but lacks better error handling in some scripts and a main.py script for orchestration. Now, all scripts must be manually run in sequence.
+
 ### Csharp
+
+Currently complete, but data is not stored in dedicated folder.
