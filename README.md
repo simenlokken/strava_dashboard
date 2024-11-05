@@ -1,8 +1,8 @@
-# Health dashboard
+# Strava dashboard
 
 ## Information
 
-This repo contains code for creating a health dashboard with data from the Strava v3 API as the main data source.
+This repo contains code for creating a dashboard with data from the Strava v3 API as the main data source.
 
 For making the API request to Strava, code in Python and C# is available.
 
