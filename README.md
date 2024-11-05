@@ -1,13 +1,22 @@
-# Strava Dashboard
+# Health dashboard
 
 ## Information
 
-Using the Strava v3 API, fetching activities from a Strava account to create a dashboard in Strava/Tableau/others.
+This repo contains code for creating a health dashboard with data from the Strava v3 API as the main data source.
 
-For replication, see code. To set up a Strava application, see Strava v3 API documentation but also see Medium for several articles describing in detail how to perform the whole process.
+For making the API request to Strava, code in Python and C# is available.
+
+### Strava v3 API
+
+To use the Strava v3 API, you must perform two steps:
+
+1. Set up your Strava application
+2. Use information in your Strava application to perform the API request
+
+Do a search on Medium to find articles who describe the process in detail, there are several articles available.
 
 ## Code
 
-**fetch_strava_data.py** fetches an access token using a refresh token from a Strava application, then fetching all activities from a Strava account.
+### Python
 
-**process_strava_data.py** processes the data and saves it locally.
+### Csharp
