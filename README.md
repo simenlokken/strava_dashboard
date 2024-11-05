@@ -17,6 +17,8 @@ Do a search on Medium to find articles who describe the process in detail, there
 
 ## Code
 
+Both the Python and C# code perform the exact same operation, just in two different languages.
+
 ### Python
 
 ### Csharp
