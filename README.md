@@ -19,10 +19,4 @@ Do a search on Medium to find articles who describe the process in detail, there
 
 Both the Python and C# code perform the exact same operation, just in two different languages.
 
-### Python
-
-Currently complete, but lacks better error handling in some scripts and a main.py script for orchestration. Now, all scripts must be manually run in sequence.
-
-### Csharp
-
-Currently complete (I guess).
+API request with Python is available in both OOP and procedural style.
