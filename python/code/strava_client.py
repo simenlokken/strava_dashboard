@@ -1,8 +1,5 @@
 import os
 import requests
-import csv
-import json
-from pathlib import Path
 from dotenv import load_dotenv
 
 load_dotenv()
@@ -54,34 +51,4 @@ class StravaClient:
             page += 1
 
         print(f"Fetched {len(activities)} activities.")
-        return activities   
-
-class DataSaver:
-    @staticmethod
-    def save_activities_as_csv(activities, filepath=None):
-        # Set default filepath to data/raw_data in the root directory of the script
-        if filepath is None:
-            script_dir = Path(__file__).resolve().parent.parent
-            filepath = script_dir / "data" / "raw" / "raw_data.csv"
-
-        filepath.parent.mkdir(parents=True, exist_ok=True)
-
-        if not activities:
-            print("No activities to save.")
-            return
-        
-        headers = activities[0].keys()
-        with open(filepath, mode="w", newline="", encoding="utf-8") as file:
-            writer = csv.DictWriter(file, fieldnames=headers)
-            writer.writeheader()
-            writer.writerows(activities)
-
-        print(f"Data saved to {filepath}")
-
-if __name__ == "__main__":
-    try:
-        client = StravaClient()
-        activities = client.get_activities()
-        DataSaver.save_activities_as_csv(activities)
-    except Exception as ex:
-        print(f"An error occurred: {ex}")
+        return activities
