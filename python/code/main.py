@@ -4,6 +4,7 @@ from log_body_metrics import BodyMetricsLogger
 from date_table_creator import DateTableCreator
 
 if __name__ == "__main__":
+
     try:
         client = StravaClient()
         activities = client.get_activities()
@@ -14,5 +15,6 @@ if __name__ == "__main__":
         
         date_creator = DateTableCreator()
         date_creator.create_date_table()
+
     except Exception as ex:
         print(f"An error occurred: {ex}")
