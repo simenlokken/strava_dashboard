@@ -36,15 +36,22 @@ class StravaDataProcessor:
     def process_data(self, data):
 
         data_processed = data.select(self.columns_to_keep)
+
         data_processed = data_processed.with_columns([
-        (pl.col("average_speed") * 3.6).round(2),
-        (pl.col("max_speed") * 3.6).round(2),
-        (pl.col("moving_time") / 3600).round(2),
-        (pl.col("elapsed_time") / 3600).round(2),
-        (pl.col("start_date_local").str.strptime(pl.Datetime, "%Y-%m-%dT%H:%M:%SZ").dt.date().alias("date")),
-        (pl.col("start_date_local").str.strptime(pl.Datetime, "%Y-%m-%dT%H:%M:%SZ").dt.time().alias("time_of_day"))
-    ]) \
-    .drop("start_date_local")
+            (pl.col("average_speed") * 3.6).round(2),
+            (pl.col("max_speed") * 3.6).round(2),
+            (pl.col("moving_time") / 3600).round(2),
+            (pl.col("elapsed_time") / 3600).round(2),
+            (pl.col("start_date_local").str.strptime(pl.Datetime, "%Y-%m-%dT%H:%M:%SZ").dt.date().alias("date")),
+            (pl.col("start_date_local").str.strptime(pl.Datetime, "%Y-%m-%dT%H:%M:%SZ").dt.time().alias("time_of_day"))
+        ]) \
+        .drop("start_date_local")
+
+        cum_columns = ["moving_time", "distance", "kilojoules", "total_elevation_gain"]
+
+        for col in cum_columns:
+            data_processed = data_processed \
+            .with_columns(pl.col(col).cum_sum().alias(f"cumulative_{col}"))
 
         return data_processed
     
