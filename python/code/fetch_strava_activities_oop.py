@@ -3,6 +3,9 @@ import requests
 import csv
 import json
 from pathlib import Path
+from dotenv import load_dotenv
+
+load_dotenv()
 
 class StravaClient:
     def __init__(self) -> None:
