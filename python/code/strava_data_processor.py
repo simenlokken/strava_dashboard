@@ -6,7 +6,7 @@ class StravaDataProcessor:
     def __init__(self):
         self.root = Path(__file__).resolve().parent.parent
         self.raw_data_path = self.root / "data" / "raw" / "raw_data.csv"
-        self.processed_data = self.root / "data" / "processed" / "processed_data.csv"
+        self.processed_data_path = self.root / "data" / "processed" / "processed_data.csv"
         self.columns_to_keep = [
             "id",
             "name",
@@ -37,10 +37,14 @@ class StravaDataProcessor:
 
         data_processed = data.select(self.columns_to_keep)
         data_processed = data_processed.with_columns([
-            (pl.col("average_speed") * 3.6).round(2).alias("average_speed_kmh"),
-            pl.col("start_date_local").str.strptime(pl.Datetime, fmt="%Y-%m-%dT%H:%M:%SZ").alias("start_date"),
-            pl.col("start_date_local").str.strptime(pl.Datetime, fmt="%Y-%m-%dT%H:%M:%SZ").dt.hour().alias("start_hour"),
-        ])
+        (pl.col("average_speed") * 3.6).round(2),
+        (pl.col("max_speed") * 3.6).round(2),
+        (pl.col("moving_time") / 3600).round(2),
+        (pl.col("elapsed_time") / 3600).round(2),
+        (pl.col("start_date_local").str.strptime(pl.Datetime, "%Y-%m-%dT%H:%M:%SZ").dt.date().alias("date")),
+        (pl.col("start_date_local").str.strptime(pl.Datetime, "%Y-%m-%dT%H:%M:%SZ").dt.time().alias("time_of_day"))
+    ]) \
+    .drop("start_date_local")
 
         return data_processed
     
