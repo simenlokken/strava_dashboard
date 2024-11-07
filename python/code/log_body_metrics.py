@@ -4,7 +4,7 @@ from pathlib import Path
 
 class BodyMetricsLogger:
 
-    def get_body_metrics_for_days(self):
+    def input_body_metrics(self):
 
         metrics = {}
         while True:
@@ -66,7 +66,7 @@ class BodyMetricsLogger:
 
 if __name__ == "__main__":
     logger = BodyMetricsLogger()
-    metrics = logger.get_body_metrics_for_days()
+    metrics = logger.input_body_metrics()
     if metrics:
         logger.log_body_metrics(metrics)
     else:
