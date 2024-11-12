@@ -5,8 +5,8 @@ class StravaDataProcessor:
 
     def __init__(self):
         self.root = Path(__file__).resolve().parent.parent
-        self.raw_data_path = self.root / "data" / "raw" / "raw_data.csv"
-        self.processed_data_path = self.root / "data" / "processed" / "processed_data.csv"
+        self.raw_data_path = self.root / "data" / "raw" / "raw_data.parquet"
+        self.processed_data_path = self.root / "data" / "processed" / "processed_data.parquet"
         self.columns_to_keep = [
             "id",
             "name",
@@ -28,14 +28,12 @@ class StravaDataProcessor:
             "total_elevation_gain",
             "suffer_score",
         ]
-
-    def read_raw_data(self):
-
-        return pl.read_csv(self.raw_data_path)
     
-    def process_data(self, data):
+    def process_data(self):
 
-        data_processed = data.select(self.columns_to_keep)
+        raw_data = pl.read_parquet(self.raw_data_path)
+
+        data_processed = raw_data.select(self.columns_to_keep)
 
         data_processed = data_processed.with_columns([
             (pl.col("average_speed") * 3.6).round(2),
@@ -55,12 +53,12 @@ class StravaDataProcessor:
 
         return data_processed
     
-    def save_processed_data(self, data):
+    def save_processed_data(self, data_processed):
         self.processed_data_path.parent.mkdir(parents=True, exist_ok=True)
-        data.write_csv(self.processed_data_path)
+        data_processed.write_parquet(self.processed_data_path)
         print(f"Processed data saved to {self.processed_data_path}")
 
-    def process_and_save_data(self):
-        raw_data = self.read_raw_data()
-        processed_data = self.process_data(raw_data)
-        self.save_processed_data(processed_data)
+if __name__ == "__main__":
+    processor = StravaDataProcessor()
+    data = processor.process_data()
+    processor.save_processed_data(data)

@@ -4,7 +4,6 @@ from dotenv import load_dotenv
 import polars as pl
 import time
 from pathlib import Path
-import pandas as pd
 
 load_dotenv()
 

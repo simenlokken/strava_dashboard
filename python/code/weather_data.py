@@ -35,7 +35,6 @@ class WeatherData():
 if __name__ == "__main__":    
 
     weather_data = WeatherData()
-
     lat, lon = 59.91, 10.75
     weather = weather_data.get_weather_data(lat, lon)
     print(weather)
