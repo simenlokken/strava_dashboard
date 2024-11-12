@@ -3,6 +3,8 @@ import requests
 from dotenv import load_dotenv
 import polars as pl
 import time
+from pathlib import Path
+import pandas as pd
 
 load_dotenv()
 
@@ -24,7 +26,7 @@ class StravaClient:
         }
 
         print("Fetching access token...")
-        time.sleep(2)
+        time.sleep(1)
 
         response = requests.post(self.auth_url, data=payload)
         if response.status_code != 200:
@@ -32,6 +34,7 @@ class StravaClient:
         
         self.access_token = response.json().get("access_token")
         print("Access token has been successfully retrieved.")
+        time.sleep(1)
         return self.access_token
     
     def get_activities(self, per_page=200):
@@ -58,9 +61,21 @@ class StravaClient:
             page += 1
 
         print(f"Succesfully fetched {len(activities)} activities.")
-        return pl.DataFrame(activities)
+
+        data = pl.DataFrame(activities)
+        return data
+    
+    def save_file(self, data):
+
+        root = Path(__file__).resolve().parent.parent
+        file_path = root / "data" / "raw" / "raw_data.parquet"
+        file_path.parent.mkdir(parents=True, exist_ok=True)  # Create directories if they don't exist
+        data.write_parquet(file_path)
+        print(f"File has been saved as {file_path}.")
+
 
 if __name__ == "__main__":
     client = StravaClient()
     activities = client.get_activities()
     print(activities)
+    client.save_file(activities)
