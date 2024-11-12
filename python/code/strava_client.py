@@ -58,9 +58,9 @@ class StravaClient:
             page += 1
 
         print(f"Succesfully fetched {len(activities)} activities.")
-        return activities
+        return pl.DataFrame(activities)
 
 if __name__ == "__main__":
     client = StravaClient()
     activities = client.get_activities()
-    print(pl.DataFrame(activities))
+    print(activities)
