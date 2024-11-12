@@ -1,6 +1,8 @@
 import os
 import requests
 from dotenv import load_dotenv
+import polars as pl
+import time
 
 load_dotenv()
 
@@ -21,12 +23,15 @@ class StravaClient:
             "grant_type": "refresh_token"
         }
 
+        print("Fetching access token...")
+        time.sleep(2)
+
         response = requests.post(self.auth_url, data=payload)
         if response.status_code != 200:
-            raise Exception(f"Failed to fetch access token: {response.status_code}")
+            raise Exception(f"Failed to fetch access token. Error message: {response.status_code}")
         
         self.access_token = response.json().get("access_token")
-        print("Access token fetched successfully.")
+        print("Access token has been successfully retrieved.")
         return self.access_token
     
     def get_activities(self, per_page=200):
@@ -36,6 +41,8 @@ class StravaClient:
         activities = []
         page = 1
         headers = {"Authorization": f"Bearer {self.access_token}"}
+
+        print("Fetching Strava activities...")
 
         while True:
             response = requests.get(self.activities_url, headers=headers, params={"per_page": per_page, "page": page})
@@ -50,5 +57,10 @@ class StravaClient:
             activities.extend(page_activities)
             page += 1
 
-        print(f"Fetched {len(activities)} activities.")
-        return activities
+        print(f"Succesfully fetched {len(activities)} activities.")
+        return pl.DataFrame(activities)
+
+if __name__ == "__main__":
+    client = StravaClient()
+    activities = client.get_activities()
+    print(activities)

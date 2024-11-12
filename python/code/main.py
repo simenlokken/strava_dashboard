@@ -11,11 +11,6 @@ if __name__ == "__main__":
         activities = client.get_activities()
         DataSaver.save_activities_as_csv(activities)
         
-        logger = BodyMetricsLogger()
-        metrics = logger.get_body_metrics_for_days()
-        if metrics:
-            logger.log_body_metrics(metrics)
-        
         date_creator = DateTableCreator()
         date_creator.create_date_table()
 
