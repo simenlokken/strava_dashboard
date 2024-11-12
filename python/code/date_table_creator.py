@@ -17,3 +17,8 @@ class DateTableCreator:
         date_table_path = root / "data" / "processed"
         date_table_path.mkdir(parents=True, exist_ok=True)
         date_table.to_csv(date_table_path / "date_table.csv", index=False)
+
+if __name__ == "__main__":
+    print("Creating a date table...")
+    date_table = DateTableCreator()
+    date_table.create_date_table()
