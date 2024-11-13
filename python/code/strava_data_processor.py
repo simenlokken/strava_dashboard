@@ -51,11 +51,11 @@ class StravaDataProcessor:
         ]) \
         .drop("start_date_local")
 
-        cum_columns = ["moving_time", "distance", "kilojoules", "total_elevation_gain"]
+        # cum_columns = ["moving_time", "distance", "kilojoules", "total_elevation_gain"]
 
-        for col in cum_columns:
-            data_processed = data_processed \
-            .with_columns(pl.col(col).cum_sum().alias(f"cumulative_{col}"))
+        # for col in cum_columns:
+        #    data_processed = data_processed \
+        #    .with_columns(pl.col(col).cum_sum().alias(f"cumulative_{col}"))
 
         data_processed_with_coordinates = data_processed \
         .with_columns(
