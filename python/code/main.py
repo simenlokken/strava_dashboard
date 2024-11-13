@@ -13,7 +13,8 @@ if __name__ == "__main__":
         date_creator.create_date_table()
 
         data_processor = StravaDataProcessor()
-        data_processor.process_and_save_data()
+        data = data_processor.process_data()
+        data_processor.save_processed_data(data)
 
     except Exception as ex:
         print(f"An error occurred: {ex}")
