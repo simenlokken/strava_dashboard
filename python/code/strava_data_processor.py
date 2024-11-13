@@ -1,5 +1,6 @@
 import polars as pl
 from pathlib import Path
+import time
 
 class StravaDataProcessor:
 
@@ -31,6 +32,9 @@ class StravaDataProcessor:
     
     def process_data(self):
 
+        print("Initialized data processing...")
+        time.sleep(1)
+
         raw_data = pl.read_parquet(self.raw_data_path)
 
         data_processed = raw_data.select(self.columns_to_keep)
@@ -51,12 +55,15 @@ class StravaDataProcessor:
             data_processed = data_processed \
             .with_columns(pl.col(col).cum_sum().alias(f"cumulative_{col}"))
 
+        print("Data has been processed. Initalizing saving...")
+        time.sleep(1)
+
         return data_processed
     
     def save_processed_data(self, data_processed):
         self.processed_data_path.parent.mkdir(parents=True, exist_ok=True)
         data_processed.write_parquet(self.processed_data_path)
-        print(f"Processed data saved to {self.processed_data_path}")
+        print(f"Processed data saved has been saved to file path: {self.processed_data_path}")
 
 if __name__ == "__main__":
     processor = StravaDataProcessor()
