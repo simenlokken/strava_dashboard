@@ -22,6 +22,7 @@ class StravaDataProcessor:
             "average_cadence",
             "average_heartrate",
             "kilojoules",
+            "start_latlng",
             "average_temp",
             "max_speed",
             "max_watts",
@@ -54,6 +55,30 @@ class StravaDataProcessor:
         for col in cum_columns:
             data_processed = data_processed \
             .with_columns(pl.col(col).cum_sum().alias(f"cumulative_{col}"))
+        
+        data_processed_without_coordinates = data_processed \
+            .with_columns(
+                pl.col("start_latlng").list.len().alias("length")
+            ) \
+            .filter(pl.col("length") != 2) \
+            .with_columns(
+                pl.lit(None).alias("latitude"),
+                pl.lit(None).alias("longitude")
+            ) \
+            .drop("start_latlng", "length")
+        
+        data_processed_with_coordinates = data_processed \
+            .with_columns(
+                pl.col("start_latlng").list.len().alias("length")
+            ) \
+            .filter(pl.col("length") == 2) \
+            .with_columns(
+                pl.col("start_latlng").list.gather(0).alias("latitude"),
+                pl.col("start_latlng").list.gather(1).alias("longitude")
+            ) \
+            .drop("start_latlng", "length")
+        
+        data_processed = pl.concat([data_processed_without_coordinates, data_processed_with_coordinates], how="vertical")
 
         print("Data has been processed. Initalizing saving...")
         time.sleep(1)
