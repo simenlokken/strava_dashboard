@@ -59,7 +59,7 @@ class StravaClient:
             activities.extend(page_activities)
             page += 1
 
-        print(f"Succesfully fetched {len(activities)} activities.")
+        print(f"Successfully fetched {len(activities)} activities.")
 
         data = pl.DataFrame(activities)
         return data
@@ -68,9 +68,9 @@ class StravaClient:
 
         root = Path(__file__).resolve().parent.parent
         file_path = root / "data" / "raw" / "raw_data.parquet"
-        file_path.parent.mkdir(parents=True, exist_ok=True)  # Create directories if they don't exist
+        file_path.parent.mkdir(parents=True, exist_ok=True)
         data.write_parquet(file_path)
-        print(f"File has been saved as {file_path}.")
+        print(f"Raw data has been saved to file path: {file_path}.")
 
 
 if __name__ == "__main__":

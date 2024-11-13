@@ -22,6 +22,7 @@ class StravaDataProcessor:
             "average_cadence",
             "average_heartrate",
             "kilojoules",
+            "start_latlng",
             "average_temp",
             "max_speed",
             "max_watts",
@@ -40,6 +41,7 @@ class StravaDataProcessor:
         data_processed = raw_data.select(self.columns_to_keep)
 
         data_processed = data_processed.with_columns([
+            (pl.col("distance") / 1000).round(2),
             (pl.col("average_speed") * 3.6).round(2),
             (pl.col("max_speed") * 3.6).round(2),
             (pl.col("moving_time") / 3600).round(2),
@@ -55,6 +57,34 @@ class StravaDataProcessor:
             data_processed = data_processed \
             .with_columns(pl.col(col).cum_sum().alias(f"cumulative_{col}"))
 
+        data_processed_with_coordinates = data_processed \
+        .with_columns(
+            pl.col("start_latlng").list.len().alias("length")
+        ) \
+        .filter(pl.col("length") == 2) \
+        .with_columns(
+            pl.col("start_latlng").list.gather(0).alias("latitude"),
+            pl.col("start_latlng").list.gather(1).alias("longitude")
+        ) \
+        .with_columns(
+            pl.col("latitude").explode(),
+            pl.col("longitude").explode()
+        ) \
+        .drop("start_latlng", "length")
+        
+        data_processed_without_coordinates = data_processed \
+            .with_columns(
+                pl.col("start_latlng").list.len().alias("length")
+            ) \
+            .filter(pl.col("length") != 2) \
+            .with_columns(
+                pl.lit(None, dtype=pl.Float64).alias("latitude"),
+                pl.lit(None, dtype=pl.Float64).alias("longitude")
+            ) \
+            .drop("start_latlng", "length")
+        
+        data_processed = pl.concat([data_processed_without_coordinates, data_processed_with_coordinates], how="vertical")
+
         print("Data has been processed. Initalizing saving...")
         time.sleep(1)
 
@@ -63,9 +93,10 @@ class StravaDataProcessor:
     def save_processed_data(self, data_processed):
         self.processed_data_path.parent.mkdir(parents=True, exist_ok=True)
         data_processed.write_parquet(self.processed_data_path)
-        print(f"Processed data saved has been saved to file path: {self.processed_data_path}")
+        print(f"Processed data saved has been saved to file path: {self.processed_data_path}.")
 
 if __name__ == "__main__":
     processor = StravaDataProcessor()
     data = processor.process_data()
     processor.save_processed_data(data)
+    print(data)
