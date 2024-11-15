@@ -38,13 +38,23 @@ class BodyMetricsLogger:
             new_entries = []
 
             for date, data in metrics.items():
-                new_entry = pl.DataFrame({
-                    "date": [date],
-                    "weight": [data["weight"]],
-                    "bmi": [round(data["weight"] / (height**2), 1)],
-                    "fat_mass": [data["fat_mass"]],
-                    "bone_mass": [data["bone_mass"]]
-                    })
+                new_entry = pl.DataFrame(
+                    {
+                        "date": [date],
+                        "weight": [data["weight"]],
+                        "bmi": [round(data["weight"] / (height**2), 1)],
+                        "fat_mass": [data["fat_mass"]],
+                        "bone_mass": [data["bone_mass"]]
+                    },
+                    schema={
+                        "date": pl.String,
+                        "weight": pl.Float32,
+                        "bmi": pl.Float32,
+                        "fat_mass": pl.Float32,
+                        "bone_mass": pl.Float32
+                        },
+                        strict=True
+                )
                 
                 new_entries.append(new_entry)
 
